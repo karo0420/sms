@@ -1,0 +1,18 @@
+{
+    "name": "karo0420/smspanel",
+    "type": "library",
+    "require": {
+        "guzzlehttp/guzzle": "^7.8"
+    },
+    "autoload": {
+        "psr-4": {
+            "Karo0420\\Smspanel\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "karo0420",
+            "email": "soleimanian.h2o@gmail.com"
+        }
+    ]
+}
