@@ -2,7 +2,8 @@
     "name": "karo0420/smspanel",
     "type": "library",
     "require": {
-        "guzzlehttp/guzzle": "^7.8"
+        "guzzlehttp/guzzle": "^7.8",
+        "kavenegar/php": "^1.2"
     },
     "autoload": {
         "psr-4": {
