@@ -1,5 +1,8 @@
 <?php
-namespace Karo0420\Smspanel;
+namespace Karo0420\Smspanel\Operators;
+
+use Karo0420\Smspanel\BaseMessage;
+use Karo0420\Smspanel\BaseSMS;
 
 // use Illuminate\Support\Facades\Log;
 
