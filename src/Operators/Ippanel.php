@@ -8,29 +8,48 @@ class Ippanel extends BaseSMS
 {
     public function send(array $to, BaseMessage $message)
     {
-        $url = 'http://rest.ippanel.com/v1/messages';
+
+        $username = $this->config['username'];
+        $password = $this->config['password'];
+        $from     = $this->config['sender'];
+
         $messageBody = $message->getMessage();
-        $data = array(
-            "originator" => $this->config['sender'],
-            "recipients" => $to,
-            "message" => $messageBody['text']
-        );
 
+        switch ($message->type()) {
+            case BaseMessage::TYPE_PATTERN:
+                $input_data = $messageBody['params'];
+                $url = "https://ippanel.com/patterns/pattern?username=". $username . 
+                    "&password=" . urlencode($password) . 
+                    "&from=$from&to=" . json_encode($to) . 
+                    "&input_data=" . urlencode(json_encode($input_data)) . 
+                    "&pattern_code=".$messageBody['id'];
+                break;
+            case BaseMessage::TYPE_TEXT:
+                $url = "https://ippanel.com/services.jspd";
+                $input_data = [
+                    'uname'=> $username,
+                    'pass'=> $password,
+                    'from'=> $from,
+                    'message'=> $messageBody['text'],
+                    'to'=> json_encode($to),
+                    'op'=> 'send'
+                ];
+                break;
+            default:
+                # code...
+                break;
+        }
 
-        $jsonData = json_encode($data);
+        $handler = curl_init($url);
+        curl_setopt($handler, CURLOPT_CUSTOMREQUEST, "POST");
+        curl_setopt($handler, CURLOPT_POSTFIELDS, $input_data);
+        curl_setopt($handler, CURLOPT_RETURNTRANSFER, true);
+        $response = curl_exec($handler);
 
-        $ch = curl_init($url);
+        $response = json_decode($response);
+		$res_code = $response[0];
+		$res_data = $response[1];
 
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-            'Content-Type: application/json',
-            'Content-Length: ' . strlen($jsonData),
-            'Authorization: AccessKey ' . $this->config['api_key']
-        ));
-
-        $response = curl_exec($ch);
-        curl_close($ch);
+        return $response;
     }
 }
