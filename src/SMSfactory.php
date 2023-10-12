@@ -3,6 +3,7 @@
 namespace Karo0420\Smspanel;
 
 use GuzzleHttp\Client;
+use Karo0420\Smspanel\Operators\Ippanel;
 use Karo0420\Smspanel\Operators\KaveNegar;
 
 # write a class to create different sms insrance like farazsms
@@ -15,6 +16,9 @@ class SMSfactory
         switch ($sms) {
             case 'farazsms':
                 return new FarazSMS(new Client(), $config);
+                break;
+            case 'ippanel':
+                return new Ippanel(new Client(), $config);
                 break;
             case 'kavenegar':
                 return new KaveNegar(new Client(), $config);
