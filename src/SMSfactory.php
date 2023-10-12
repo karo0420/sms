@@ -16,7 +16,7 @@ class SMSfactory
         switch ($sms) {
             case 'farazsms':
                 return new FarazSMS(new Client(), $config);
-                break;
+                break; 
             case 'ippanel':
                 return new Ippanel(new Client(), $config);
                 break;
