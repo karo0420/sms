@@ -1,6 +1,7 @@
 <?php
 namespace Karo0420\Smspanel\Operators;
 
+use Exception;
 use Karo0420\Smspanel\BaseMessage;
 use Karo0420\Smspanel\BaseSMS;
 use Kavenegar\Exceptions\ApiException;
@@ -24,10 +25,12 @@ class KaveNegar extends BaseSMS
                     'Content-Type: application/x-www-form-urlencoded',
                     'charset: utf-8'
                 );
+
                 $fields_string = "";
                 if (!is_null($data)) {
                     $fields_string = http_build_query($data);
                 }
+
                 $handle = curl_init();
                 $url = "https://api.kavenegar.com/v1/".$this->config['api_key']."/verify/lookup.json/";
                 curl_setopt($handle, CURLOPT_URL, $url);
@@ -40,6 +43,9 @@ class KaveNegar extends BaseSMS
             
                 $response = curl_exec($handle);
                 curl_close($handle);
+                $res = json_decode($response);
+                if ($res->return->status != 200);
+                    throw new \Exception($res->return->message, $res->return->status);
                 break;
             case BaseMessage::TYPE_TEXT:
                 $api = new \Kavenegar\KavenegarApi($this->config['api_key']);

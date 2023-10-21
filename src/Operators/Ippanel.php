@@ -23,6 +23,7 @@ class Ippanel extends BaseSMS
                     "&from=$from&to=" . json_encode($to) . 
                     "&input_data=" . urlencode(json_encode($input_data)) . 
                     "&pattern_code=".$messageBody['id'];
+                // $url = 'https://ippanel.com/services.jspd';
                 break;
             case BaseMessage::TYPE_TEXT:
                 $url = "https://ippanel.com/services.jspd";
@@ -40,16 +41,32 @@ class Ippanel extends BaseSMS
                 break;
         }
 
-        $handler = curl_init($url);
-        curl_setopt($handler, CURLOPT_CUSTOMREQUEST, "POST");
-        curl_setopt($handler, CURLOPT_POSTFIELDS, $input_data);
-        curl_setopt($handler, CURLOPT_RETURNTRANSFER, true);
-        $response = curl_exec($handler);
+        $headers = array(
+            'Accept: application/json',
+            'Content-Type: application/x-www-form-urlencoded',
+            'charset: utf-8'
+        );
+
+        $fields_string = "";
+        if (!is_null($input_data))
+            $fields_string = http_build_query($input_data);
+
+        $handle = curl_init();
+        curl_setopt($handle, CURLOPT_URL, $url);
+        curl_setopt($handle, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($handle, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($handle, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($handle, CURLOPT_POST, true);
+        curl_setopt($handle, CURLOPT_POSTFIELDS, $fields_string);
+        $response = curl_exec($handle);
+        curl_close($handle);
 
         $response = json_decode($response);
 		$res_code = $response[0];
 		$res_data = $response[1];
-
+        if ($res_code !== 0)
+            throw new \Exception($res_data, $res_code);
         return $response;
     }
 }
